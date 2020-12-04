@@ -8,8 +8,19 @@ export type UseShelf<Hooks extends {}> = <K extends keyof Hooks>(key: K) => Hook
 
 export function createShelf<Hooks extends {}>(
   defaultShelf?: Shelf<Hooks>
-): [ShelfProvider<Hooks>, UseShelf<Hooks>] {
+): [UseShelf<Hooks>, ShelfProvider<Hooks>] {
   const ShelfContext = React.createContext<Shelf<Hooks> | undefined>(defaultShelf);
+
+  const useShelf = <K extends keyof Hooks>(key: K): Hooks[K] => {
+    const shelf = useContext(ShelfContext);
+    const useHook = shelf?.[key];
+    if (typeof useHook !== "function") {
+      throw new Error(
+        `hook '${String(key)}' is not in the shelf or not a function: ${String(useHook)}`
+      );
+    }
+    return useHook as Hooks[K];
+  };
 
   const ShelfProvider: ShelfProvider<Hooks> = ({ shelf, children }) => {
     const parentShelf = useContext(ShelfContext);
@@ -23,16 +34,5 @@ export function createShelf<Hooks extends {}>(
     return <ShelfContext.Provider value={childShelf}>{children}</ShelfContext.Provider>;
   };
 
-  const useShelf = <K extends keyof Hooks>(key: K): Hooks[K] => {
-    const shelf = useContext(ShelfContext);
-    const useHook = shelf?.[key];
-    if (typeof useHook !== "function") {
-      throw new Error(
-        `hook '${String(key)}' is not in the shelf or not a function: ${String(useHook)}`
-      );
-    }
-    return useHook as Hooks[K];
-  };
-
-  return [ShelfProvider, useShelf];
+  return [useShelf, ShelfProvider];
 }

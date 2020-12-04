@@ -9,7 +9,49 @@ describe("createShelf", () => {
       useString: (id: string) => string;
       useInvalid: unknown;
     };
-    const [ShelfProvider, useShelf] = createShelf<Hooks>();
+    const [useShelf, ShelfProvider] = createShelf<Hooks>();
+
+    describe("useShelf", () => {
+      it("should call a hook provided by parents", () => {
+        const useNumber: Hooks["useNumber"] = jest.fn(() => 0);
+        const shelf: Shelf<Hooks> = { useNumber };
+
+        const Wrapper: React.FC = ({ children }) => (
+          <ShelfProvider shelf={shelf}>{children}</ShelfProvider>
+        );
+        const t = renderHook(() => useShelf("useNumber")("answer"), {
+          wrapper: Wrapper,
+        });
+
+        expect(useNumber).toHaveBeenCalledWith("answer");
+        expect(t.result.current).toBe(0);
+      });
+
+      it("should throw error if no hook is provided by parents", () => {
+        const t = renderHook(() => useShelf("useNumber")("answer"));
+
+        expect(t.result.error).toEqual(
+          new Error("hook 'useNumber' is not in the shelf or not a function: undefined")
+        );
+      });
+
+      it("should throw error if provided value is not a function", () => {
+        const shelf: Shelf<Hooks> = {
+          useInvalid: "NOT_A_FUNCTION",
+        };
+
+        const Wrapper: React.FC = ({ children }) => (
+          <ShelfProvider shelf={shelf}>{children}</ShelfProvider>
+        );
+        const t = renderHook(() => useShelf("useInvalid"), {
+          wrapper: Wrapper,
+        });
+
+        expect(t.result.error).toEqual(
+          new Error("hook 'useInvalid' is not in the shelf or not a function: NOT_A_FUNCTION")
+        );
+      });
+    });
 
     describe("ShelfProvider", () => {
       it("should provide hooks to the context", () => {
@@ -67,48 +109,6 @@ describe("createShelf", () => {
         expect(t.result.current).toBe(0);
       });
     });
-
-    describe("useShelf", () => {
-      it("should call a hook provided by parents", () => {
-        const useNumber: Hooks["useNumber"] = jest.fn(() => 0);
-        const shelf: Shelf<Hooks> = { useNumber };
-
-        const Wrapper: React.FC = ({ children }) => (
-          <ShelfProvider shelf={shelf}>{children}</ShelfProvider>
-        );
-        const t = renderHook(() => useShelf("useNumber")("answer"), {
-          wrapper: Wrapper,
-        });
-
-        expect(useNumber).toHaveBeenCalledWith("answer");
-        expect(t.result.current).toBe(0);
-      });
-
-      it("should throw error if no hook is provided by parents", () => {
-        const t = renderHook(() => useShelf("useNumber")("answer"));
-
-        expect(t.result.error).toEqual(
-          new Error("hook 'useNumber' is not in the shelf or not a function: undefined")
-        );
-      });
-
-      it("should throw error if provided value is not a function", () => {
-        const shelf: Shelf<Hooks> = {
-          useInvalid: "NOT_A_FUNCTION",
-        };
-
-        const Wrapper: React.FC = ({ children }) => (
-          <ShelfProvider shelf={shelf}>{children}</ShelfProvider>
-        );
-        const t = renderHook(() => useShelf("useInvalid"), {
-          wrapper: Wrapper,
-        });
-
-        expect(t.result.error).toEqual(
-          new Error("hook 'useInvalid' is not in the shelf or not a function: NOT_A_FUNCTION")
-        );
-      });
-    });
   });
 
   describe("with default hooks", () => {
@@ -119,7 +119,7 @@ describe("createShelf", () => {
         useNumber,
         useString,
       };
-      const [, useShelf] = createShelf(defaultShelf);
+      const [useShelf] = createShelf(defaultShelf);
 
       const t = renderHook(() => useShelf("useNumber")("answer"));
 
