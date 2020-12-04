@@ -1,8 +1,8 @@
 import React from "react";
 import { renderHook } from "@testing-library/react-hooks";
-import { Shelf, UseShelf, ShelfProvider, createShelf } from ".";
+import { HooksProviderComponent, UseHook, createHookshelf } from ".";
 
-describe("createShelf", () => {
+describe("createHookshelf", () => {
   type Hooks = {
     useNumber: (id: string) => number;
     useString: (id: string) => string;
@@ -11,29 +11,29 @@ describe("createShelf", () => {
   const createFixture = (): {
     defaultHooks: Hooks;
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    ShelfProvider: ShelfProvider<Hooks>;
+    HooksProvider: HooksProviderComponent<Hooks>;
     proxyHooks: Hooks;
-    useShelf: UseShelf<Hooks>;
+    useHook: UseHook<Hooks>;
   } => {
     const defaultHooks = {
       useNumber: jest.fn(() => 0),
       useString: jest.fn((): string => ""),
     };
-    const [ShelfProvider, proxyHooks, useShelf] = createShelf<Hooks>(defaultHooks);
+    const [HooksProvider, proxyHooks, useHook] = createHookshelf<Hooks>(defaultHooks);
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    return { defaultHooks, ShelfProvider, proxyHooks, useShelf };
+    return { defaultHooks, HooksProvider, proxyHooks, useHook };
   };
 
-  describe("ShelfProvider", () => {
+  describe("HooksProvider", () => {
     it("should override hooks in the shelf", () => {
-      const { defaultHooks, ShelfProvider, useShelf } = createFixture();
+      const { defaultHooks, HooksProvider, useHook } = createFixture();
 
       const useNumber: Hooks["useNumber"] = jest.fn(() => 42);
-      const shelf: Shelf<Hooks> = { useNumber };
+      const hooks: Partial<Hooks> = { useNumber };
       const Wrapper: React.FC = ({ children }) => (
-        <ShelfProvider shelf={shelf}>{children}</ShelfProvider>
+        <HooksProvider hooks={hooks}>{children}</HooksProvider>
       );
-      const t = renderHook(() => useShelf("useNumber")("answer"), {
+      const t = renderHook(() => useHook("useNumber")("answer"), {
         wrapper: Wrapper,
       });
 
@@ -42,14 +42,14 @@ describe("createShelf", () => {
       expect(t.result.current).toBe(42);
     });
 
-    it("should not override hooks if not specified", () => {
-      const { defaultHooks, ShelfProvider, useShelf } = createFixture();
+    it("should not override hooks in the shelf if not specified", () => {
+      const { defaultHooks, HooksProvider, useHook } = createFixture();
 
-      const shelf: Shelf<Hooks> = {};
+      const hooks: Partial<Hooks> = {};
       const Wrapper: React.FC = ({ children }) => (
-        <ShelfProvider shelf={shelf}>{children}</ShelfProvider>
+        <HooksProvider hooks={hooks}>{children}</HooksProvider>
       );
-      const t = renderHook(() => useShelf("useNumber")("answer"), {
+      const t = renderHook(() => useHook("useNumber")("answer"), {
         wrapper: Wrapper,
       });
 
@@ -68,12 +68,12 @@ describe("createShelf", () => {
       expect(t.result.current).toBe(0);
     });
 
-    it("should throw error if the hook is undefined", () => {
-      const { ShelfProvider, proxyHooks } = createFixture();
+    it("should throw error if the hook is undefined in the shelf", () => {
+      const { HooksProvider, proxyHooks } = createFixture();
 
-      const shelf: Shelf<Hooks> = { useNumber: undefined };
+      const hooks: Partial<Hooks> = { useNumber: undefined };
       const Wrapper: React.FC = ({ children }) => (
-        <ShelfProvider shelf={shelf}>{children}</ShelfProvider>
+        <HooksProvider hooks={hooks}>{children}</HooksProvider>
       );
       const t = renderHook(() => proxyHooks.useNumber("answer"), {
         wrapper: Wrapper,
@@ -85,24 +85,24 @@ describe("createShelf", () => {
     });
   });
 
-  describe("useShelf", () => {
+  describe("useHook", () => {
     it("should call a hook in the shelf", () => {
-      const { defaultHooks, useShelf } = createFixture();
+      const { defaultHooks, useHook } = createFixture();
 
-      const t = renderHook(() => useShelf("useNumber")("answer"));
+      const t = renderHook(() => useHook("useNumber")("answer"));
 
       expect(defaultHooks.useNumber).toHaveBeenCalledWith("answer");
       expect(t.result.current).toBe(0);
     });
 
-    it("should throw error if the hook is undefined", () => {
-      const { ShelfProvider, useShelf } = createFixture();
+    it("should throw error if the hook is undefined in the shelf", () => {
+      const { HooksProvider, useHook } = createFixture();
 
-      const shelf: Shelf<Hooks> = { useNumber: undefined };
+      const hooks: Partial<Hooks> = { useNumber: undefined };
       const Wrapper: React.FC = ({ children }) => (
-        <ShelfProvider shelf={shelf}>{children}</ShelfProvider>
+        <HooksProvider hooks={hooks}>{children}</HooksProvider>
       );
-      const t = renderHook(() => useShelf("useNumber")("answer"), {
+      const t = renderHook(() => useHook("useNumber")("answer"), {
         wrapper: Wrapper,
       });
 

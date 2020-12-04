@@ -2,40 +2,38 @@ import React, { useContext, useMemo } from "react";
 
 type AbstractHooks = Readonly<{ [key: string]: (...params: never[]) => unknown }>;
 
-export type Shelf<Hooks extends AbstractHooks> = Partial<Hooks>;
-
-export type ShelfProvider<Hooks extends AbstractHooks> = React.FC<
-  Readonly<{ shelf: Shelf<Hooks> }>
+export type HooksProviderComponent<Hooks extends AbstractHooks> = React.FC<
+  Readonly<{ hooks: Readonly<Partial<Hooks>> }>
 >;
 
-export type UseShelf<Hooks extends AbstractHooks> = <K extends keyof Hooks>(key: K) => Hooks[K];
+export type UseHook<Hooks extends AbstractHooks> = <K extends keyof Hooks>(key: K) => Hooks[K];
 
-export function createShelf<Hooks extends AbstractHooks>(
-  defaultHooks: Hooks
-): [ShelfProvider<Hooks>, Hooks, UseShelf<Hooks>] {
-  const ShelfContext = React.createContext<Shelf<Hooks>>(defaultHooks);
+export function createHookshelf<Hooks extends AbstractHooks>(
+  defaultHooks: Readonly<Hooks>
+): [HooksProviderComponent<Hooks>, Hooks, UseHook<Hooks>] {
+  const Hookshelf = React.createContext<Readonly<Hooks>>(defaultHooks);
 
-  const ShelfProvider: ShelfProvider<Hooks> = ({ shelf, children }) => {
-    const parentShelf = useContext(ShelfContext);
-    const childShelf = useMemo(
+  const HooksProvider: HooksProviderComponent<Hooks> = ({ hooks, children }) => {
+    const parentHooks = useContext(Hookshelf);
+    const childHooks = useMemo(
       () => ({
-        ...parentShelf,
-        ...shelf,
+        ...parentHooks,
+        ...hooks,
       }),
-      [parentShelf, shelf]
+      [parentHooks, hooks]
     );
-    return <ShelfContext.Provider value={childShelf}>{children}</ShelfContext.Provider>;
+    return <Hookshelf.Provider value={childHooks}>{children}</Hookshelf.Provider>;
   };
 
-  const useShelf = <K extends keyof Hooks>(key: K): Hooks[K] => {
-    const shelf = useContext(ShelfContext);
-    const useHook = shelf[key];
-    if (typeof useHook !== "function") {
+  const useHook = <K extends keyof Hooks>(key: K): Hooks[K] => {
+    const hooks = useContext(Hookshelf);
+    const useX = hooks[key];
+    if (typeof useX !== "function") {
       throw new Error(
-        `hook '${String(key)}' is not in the shelf or not a function: ${String(useHook)}`
+        `hook '${String(key)}' is not in the shelf or not a function: ${String(useX)}`
       );
     }
-    return useHook as Hooks[K];
+    return useX as Hooks[K];
   };
 
   // Create proxy hooks.
@@ -44,15 +42,15 @@ export function createShelf<Hooks extends AbstractHooks>(
   // However, it is safe in most use cases.
   const proxyHooks: Partial<Hooks> = {};
   for (const key of Object.keys(defaultHooks)) {
-    const useHook = {
+    const useProxyHook = {
       // Set the same name as that in `defaultHooks`.
       [key]: (...params: never[]): unknown => {
-        const useHook = useShelf(key);
-        return useHook(...params);
+        const useX = useHook(key);
+        return useX(...params);
       },
     }[key];
-    proxyHooks[key as keyof Hooks] = useHook as Hooks[keyof Hooks];
+    proxyHooks[key as keyof Hooks] = useProxyHook as Hooks[keyof Hooks];
   }
 
-  return [ShelfProvider, proxyHooks as Hooks, useShelf];
+  return [HooksProvider, proxyHooks as Hooks, useHook];
 }
