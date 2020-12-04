@@ -6,8 +6,10 @@ export type ShelfProvider<Hooks extends {}> = React.FC<Readonly<{ shelf: Shelf<H
 
 export type UseShelf<Hooks extends {}> = <K extends keyof Hooks>(key: K) => Hooks[K];
 
-export function createShelf<Hooks extends {}>(): [ShelfProvider<Hooks>, UseShelf<Hooks>] {
-  const ShelfContext = React.createContext<Shelf<Hooks> | undefined>(undefined);
+export function createShelf<Hooks extends {}>(
+  defaultShelf?: Shelf<Hooks>
+): [ShelfProvider<Hooks>, UseShelf<Hooks>] {
+  const ShelfContext = React.createContext<Shelf<Hooks> | undefined>(defaultShelf);
 
   const ShelfProvider: ShelfProvider<Hooks> = ({ shelf, children }) => {
     const parentShelf = useContext(ShelfContext);
