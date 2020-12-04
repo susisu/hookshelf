@@ -23,6 +23,11 @@ module.exports = {
         es6: true,
         browser: true,
       },
+      settings: {
+        react: {
+          version: "detect",
+        },
+      },
       rules: {
         "react/prop-types": "off",
         "eslint-comments/no-unused-disable": "error",
