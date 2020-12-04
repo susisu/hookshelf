@@ -18,7 +18,7 @@ describe("createShelf", () => {
       const Wrapper: React.FC = ({ children }) => (
         <ShelfProvider shelf={shelf}>{children}</ShelfProvider>
       );
-      const t = renderHook(() => useShelf("useNumber", "answer"), {
+      const t = renderHook(() => useShelf("useNumber")("answer"), {
         wrapper: Wrapper,
       });
 
@@ -38,7 +38,7 @@ describe("createShelf", () => {
           <ShelfProvider shelf={shelf2}>{children}</ShelfProvider>
         </ShelfProvider>
       );
-      const t = renderHook(() => useShelf("useNumber", "answer"), {
+      const t = renderHook(() => useShelf("useNumber")("answer"), {
         wrapper: Wrapper,
       });
 
@@ -58,7 +58,7 @@ describe("createShelf", () => {
           <ShelfProvider shelf={shelf2}>{children}</ShelfProvider>
         </ShelfProvider>
       );
-      const t = renderHook(() => useShelf("useNumber", "answer"), {
+      const t = renderHook(() => useShelf("useNumber")("answer"), {
         wrapper: Wrapper,
       });
 
@@ -75,7 +75,7 @@ describe("createShelf", () => {
       const Wrapper: React.FC = ({ children }) => (
         <ShelfProvider shelf={shelf}>{children}</ShelfProvider>
       );
-      const t = renderHook(() => useShelf("useNumber", "answer"), {
+      const t = renderHook(() => useShelf("useNumber")("answer"), {
         wrapper: Wrapper,
       });
 
@@ -84,7 +84,7 @@ describe("createShelf", () => {
     });
 
     it("should throw error if no hook is provided by parents", () => {
-      const t = renderHook(() => useShelf("useNumber", "answer"));
+      const t = renderHook(() => useShelf("useNumber")("answer"));
 
       expect(t.result.error).toEqual(
         new Error("hook 'useNumber' is not in the shelf or not a function: undefined")
