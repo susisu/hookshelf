@@ -1,12 +1,16 @@
 import React, { useContext, useMemo } from "react";
 
-export type Shelf<Hooks extends {}> = Readonly<Partial<Hooks>>;
+type AbstractHooks = Readonly<{ [key: string]: (...params: never[]) => unknown }>;
 
-export type UseShelf<Hooks extends {}> = <K extends keyof Hooks>(key: K) => Hooks[K];
+export type Shelf<Hooks extends AbstractHooks> = Partial<Hooks>;
 
-export type ShelfProvider<Hooks extends {}> = React.FC<Readonly<{ shelf: Shelf<Hooks> }>>;
+export type UseShelf<Hooks extends AbstractHooks> = <K extends keyof Hooks>(key: K) => Hooks[K];
 
-export function createShelf<Hooks extends {}>(
+export type ShelfProvider<Hooks extends AbstractHooks> = React.FC<
+  Readonly<{ shelf: Shelf<Hooks> }>
+>;
+
+export function createShelf<Hooks extends AbstractHooks>(
   defaultHooks: Hooks
 ): [UseShelf<Hooks>, ShelfProvider<Hooks>] {
   const ShelfContext = React.createContext<Shelf<Hooks>>(defaultHooks);

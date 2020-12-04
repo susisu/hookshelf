@@ -6,7 +6,6 @@ describe("createShelf", () => {
   type Hooks = {
     useNumber: (id: string) => number;
     useString: (id: string) => string;
-    useInvalid: unknown;
   };
 
   const createFixture = (): {
@@ -18,7 +17,6 @@ describe("createShelf", () => {
     const hooks = {
       useNumber: jest.fn(() => 0),
       useString: jest.fn((): string => ""),
-      useInvalid: "NOT A FUNCTION",
     };
     const [useShelf, ShelfProvider] = createShelf<Hooks>(hooks);
     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -48,16 +46,6 @@ describe("createShelf", () => {
 
       expect(t.result.error).toEqual(
         new Error("hook 'useNumber' is not in the shelf or not a function: undefined")
-      );
-    });
-
-    it("should throw error if the hook is not a function", () => {
-      const { useShelf } = createFixture();
-
-      const t = renderHook(() => useShelf("useInvalid"));
-
-      expect(t.result.error).toEqual(
-        new Error("hook 'useInvalid' is not in the shelf or not a function: NOT A FUNCTION")
       );
     });
   });
