@@ -6,6 +6,13 @@ export type HooksProviderComponent<Hooks extends AbstractHooks> = React.FC<
   Readonly<{ hooks: Readonly<Partial<Hooks>> }>
 >;
 
+/**
+ * Create a `React.Context` (= shelf) that can store hooks.
+ * @param defaultHooks A set of hooks that is in the shelf by default.
+ * @returns A pair of
+ * - a provider component that provides hooks to the shelf, and
+ * - a set of proxy hooks that will invoke hooks in the shelf when called.
+ */
 export function createHookshelf<Hooks extends AbstractHooks>(
   defaultHooks: Readonly<Hooks>
 ): [HooksProviderComponent<Hooks>, Hooks] {
