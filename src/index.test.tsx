@@ -23,64 +23,78 @@ describe("createHookshelf", () => {
     return { defaultHooks, HooksProvider, proxyHooks };
   };
 
-  describe("HooksProvider", () => {
-    it("should override hooks in the shelf", () => {
-      const { defaultHooks, HooksProvider, proxyHooks } = createFixture();
+  test("Proxy hooks can call hooks in the shelf", () => {
+    const { defaultHooks, proxyHooks } = createFixture();
 
-      const useNumber: Hooks["useNumber"] = jest.fn(() => 42);
-      const hooks: Partial<Hooks> = { useNumber };
-      const Wrapper: React.FC = ({ children }) => (
-        <HooksProvider hooks={hooks}>{children}</HooksProvider>
-      );
-      const t = renderHook(() => proxyHooks.useNumber("answer"), {
-        wrapper: Wrapper,
-      });
+    const t1 = renderHook(() => proxyHooks.useNumber("answer"));
+    expect(defaultHooks.useNumber).toHaveBeenCalledWith("answer");
+    expect(t1.result.current).toBe(0);
 
-      expect(defaultHooks.useNumber).not.toHaveBeenCalled();
-      expect(useNumber).toHaveBeenCalledWith("answer");
-      expect(t.result.current).toBe(42);
-    });
-
-    it("should not override hooks in the shelf if not specified", () => {
-      const { defaultHooks, HooksProvider, proxyHooks } = createFixture();
-
-      const hooks: Partial<Hooks> = {};
-      const Wrapper: React.FC = ({ children }) => (
-        <HooksProvider hooks={hooks}>{children}</HooksProvider>
-      );
-      const t = renderHook(() => proxyHooks.useNumber("answer"), {
-        wrapper: Wrapper,
-      });
-
-      expect(defaultHooks.useNumber).toHaveBeenCalledWith("answer");
-      expect(t.result.current).toBe(0);
-    });
+    const t2 = renderHook(() => proxyHooks.useString("name"));
+    expect(defaultHooks.useString).toHaveBeenCalledWith("name");
+    expect(t2.result.current).toBe("");
   });
 
-  describe("proxyHooks", () => {
-    it("should call a hook in the shelf", () => {
-      const { defaultHooks, proxyHooks } = createFixture();
+  test("A provider can override the hooks in the shelf", () => {
+    const { defaultHooks, HooksProvider, proxyHooks } = createFixture();
 
-      const t = renderHook(() => proxyHooks.useNumber("answer"));
+    const hooks: Partial<Hooks> = {
+      useNumber: jest.fn(() => 42),
+    };
+    const Wrapper: React.FC = ({ children }) => (
+      <HooksProvider hooks={hooks}>{children}</HooksProvider>
+    );
 
-      expect(defaultHooks.useNumber).toHaveBeenCalledWith("answer");
-      expect(t.result.current).toBe(0);
-    });
+    const t1 = renderHook(() => proxyHooks.useNumber("answer"), { wrapper: Wrapper });
+    expect(defaultHooks.useNumber).not.toHaveBeenCalled();
+    expect(hooks.useNumber).toHaveBeenCalledWith("answer");
+    expect(t1.result.current).toBe(42);
 
-    it("should throw error if the hook is undefined in the shelf", () => {
-      const { HooksProvider, proxyHooks } = createFixture();
+    const t2 = renderHook(() => proxyHooks.useString("name"), { wrapper: Wrapper });
+    expect(defaultHooks.useString).toHaveBeenCalledWith("name");
+    expect(t2.result.current).toBe("");
+  });
 
-      const hooks: Partial<Hooks> = { useNumber: undefined };
-      const Wrapper: React.FC = ({ children }) => (
-        <HooksProvider hooks={hooks}>{children}</HooksProvider>
-      );
-      const t = renderHook(() => proxyHooks.useNumber("answer"), {
-        wrapper: Wrapper,
-      });
+  test("Hooks provided by multiple providers are merged", () => {
+    const { defaultHooks, HooksProvider, proxyHooks } = createFixture();
 
-      expect(t.result.error).toEqual(
-        new Error("hook 'useNumber' is not in the shelf or not a function: undefined")
-      );
-    });
+    const hooks1: Partial<Hooks> = {
+      useNumber: jest.fn(() => 42),
+    };
+    const hooks2: Partial<Hooks> = {
+      useString: jest.fn(() => "Alice"),
+    };
+    const Wrapper: React.FC = ({ children }) => (
+      <HooksProvider hooks={hooks1}>
+        <HooksProvider hooks={hooks2}>{children}</HooksProvider>
+      </HooksProvider>
+    );
+
+    const t1 = renderHook(() => proxyHooks.useNumber("answer"), { wrapper: Wrapper });
+    expect(defaultHooks.useNumber).not.toHaveBeenCalled();
+    expect(hooks1.useNumber).toHaveBeenCalledWith("answer");
+    expect(t1.result.current).toBe(42);
+
+    const t2 = renderHook(() => proxyHooks.useString("name"), { wrapper: Wrapper });
+    expect(defaultHooks.useString).not.toHaveBeenCalled();
+    expect(hooks2.useString).toHaveBeenCalledWith("name");
+    expect(t2.result.current).toBe("Alice");
+  });
+
+  test("A provider can hide the hooks in the shelf but proxy hooks throw error", () => {
+    const { defaultHooks, HooksProvider, proxyHooks } = createFixture();
+
+    const hooks: Partial<Hooks> = {
+      useNumber: undefined,
+    };
+    const Wrapper: React.FC = ({ children }) => (
+      <HooksProvider hooks={hooks}>{children}</HooksProvider>
+    );
+
+    const t = renderHook(() => proxyHooks.useNumber("answer"), { wrapper: Wrapper });
+    expect(defaultHooks.useNumber).not.toHaveBeenCalled();
+    expect(t.result.error).toEqual(
+      new Error("hook 'useNumber' is not in the shelf or not a function: undefined")
+    );
   });
 });
