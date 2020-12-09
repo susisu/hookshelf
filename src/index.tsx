@@ -1,8 +1,8 @@
-import React, { useContext, useMemo } from "react";
+import { FC, createContext, useContext, useMemo } from "react";
 
 type AbstractHooks = Readonly<{ [key: string]: (...params: never[]) => unknown }>;
 
-export type HooksProviderComponent<Hooks extends AbstractHooks> = React.FC<
+export type HooksProviderComponent<Hooks extends AbstractHooks> = FC<
   Readonly<{ hooks: Readonly<Partial<Hooks>> }>
 >;
 
@@ -16,7 +16,7 @@ export type HooksProviderComponent<Hooks extends AbstractHooks> = React.FC<
 export function createHookshelf<Hooks extends AbstractHooks>(
   defaultHooks: Readonly<Hooks>
 ): [HooksProviderComponent<Hooks>, Hooks] {
-  const Hookshelf = React.createContext<Readonly<Hooks>>(defaultHooks);
+  const Hookshelf = createContext<Readonly<Hooks>>(defaultHooks);
 
   const HooksProvider: HooksProviderComponent<Hooks> = ({ hooks, children }) => {
     const parentHooks = useContext(Hookshelf);

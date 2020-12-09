@@ -1,4 +1,4 @@
-import React from "react";
+import { FC } from "react";
 import { renderHook } from "@testing-library/react-hooks";
 import { HooksProviderComponent, createHookshelf } from ".";
 
@@ -41,9 +41,7 @@ describe("createHookshelf", () => {
     const hooks: Partial<Hooks> = {
       useNumber: jest.fn(() => 42),
     };
-    const Wrapper: React.FC = ({ children }) => (
-      <HooksProvider hooks={hooks}>{children}</HooksProvider>
-    );
+    const Wrapper: FC = ({ children }) => <HooksProvider hooks={hooks}>{children}</HooksProvider>;
 
     const t1 = renderHook(() => proxyHooks.useNumber("answer"), { wrapper: Wrapper });
     expect(defaultHooks.useNumber).not.toHaveBeenCalled();
@@ -64,7 +62,7 @@ describe("createHookshelf", () => {
     const hooks2: Partial<Hooks> = {
       useString: jest.fn(() => "Alice"),
     };
-    const Wrapper: React.FC = ({ children }) => (
+    const Wrapper: FC = ({ children }) => (
       <HooksProvider hooks={hooks1}>
         <HooksProvider hooks={hooks2}>{children}</HooksProvider>
       </HooksProvider>
@@ -87,9 +85,7 @@ describe("createHookshelf", () => {
     const hooks: Partial<Hooks> = {
       useNumber: undefined,
     };
-    const Wrapper: React.FC = ({ children }) => (
-      <HooksProvider hooks={hooks}>{children}</HooksProvider>
-    );
+    const Wrapper: FC = ({ children }) => <HooksProvider hooks={hooks}>{children}</HooksProvider>;
 
     const t = renderHook(() => proxyHooks.useNumber("answer"), { wrapper: Wrapper });
     expect(defaultHooks.useNumber).not.toHaveBeenCalled();
