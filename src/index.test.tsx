@@ -10,7 +10,6 @@ describe("createHookshelf", () => {
 
   const createFixture = (): {
     defaultHooks: Hooks;
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     HooksProvider: HooksProviderComponent<Hooks>;
     proxyHooks: Hooks;
   } => {
@@ -19,7 +18,6 @@ describe("createHookshelf", () => {
       useString: jest.fn((): string => ""),
     };
     const [HooksProvider, proxyHooks] = createHookshelf(defaultHooks);
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     return { defaultHooks, HooksProvider, proxyHooks };
   };
 
