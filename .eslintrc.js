@@ -11,8 +11,6 @@ module.exports = {
         "plugin:react-hooks/recommended",
         "plugin:eslint-comments/recommended",
         "prettier",
-        "prettier/@typescript-eslint",
-        "prettier/react",
       ],
       parserOptions: {
         ecmaVersion: 2019,
