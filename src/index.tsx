@@ -1,9 +1,9 @@
-import { FC, createContext, useContext, useMemo } from "react";
+import React, { createContext, useContext, useMemo } from "react";
 
 type AbstractHooks = Readonly<{ [key: string]: (...params: never[]) => unknown }>;
 
-export type HooksProviderComponent<Hooks extends AbstractHooks> = FC<
-  Readonly<{ hooks: Readonly<Partial<Hooks>> }>
+export type HooksProviderComponent<Hooks extends AbstractHooks> = React.FC<
+  React.PropsWithChildren<Readonly<{ hooks: Readonly<Partial<Hooks>> }>>
 >;
 
 /**

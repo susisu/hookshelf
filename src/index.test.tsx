@@ -1,5 +1,5 @@
-import { FC } from "react";
-import { renderHook } from "@testing-library/react-hooks";
+import React from "react";
+import { renderHook } from "@testing-library/react";
 import { HooksProviderComponent, createHookshelf } from ".";
 
 describe("createHookshelf", () => {
@@ -21,6 +21,13 @@ describe("createHookshelf", () => {
     return { defaultHooks, HooksProvider, proxyHooks };
   };
 
+  // suppress error messages
+  const consoleError = jest.spyOn(console, "error").mockImplementation();
+
+  afterEach(() => {
+    consoleError.mockReset();
+  });
+
   test("Proxy hooks can call hooks in the shelf", () => {
     const { defaultHooks, proxyHooks } = createFixture();
 
@@ -39,7 +46,9 @@ describe("createHookshelf", () => {
     const hooks: Partial<Hooks> = {
       useNumber: jest.fn(() => 42),
     };
-    const Wrapper: FC = ({ children }) => <HooksProvider hooks={hooks}>{children}</HooksProvider>;
+    const Wrapper: React.FC<React.PropsWithChildren<{}>> = ({ children }) => (
+      <HooksProvider hooks={hooks}>{children}</HooksProvider>
+    );
 
     const t1 = renderHook(() => proxyHooks.useNumber("answer"), { wrapper: Wrapper });
     expect(defaultHooks.useNumber).not.toHaveBeenCalled();
@@ -60,7 +69,7 @@ describe("createHookshelf", () => {
     const hooks2: Partial<Hooks> = {
       useString: jest.fn(() => "Alice"),
     };
-    const Wrapper: FC = ({ children }) => (
+    const Wrapper: React.FC<React.PropsWithChildren<{}>> = ({ children }) => (
       <HooksProvider hooks={hooks1}>
         <HooksProvider hooks={hooks2}>{children}</HooksProvider>
       </HooksProvider>
@@ -83,12 +92,13 @@ describe("createHookshelf", () => {
     const hooks: Partial<Hooks> = {
       useNumber: undefined,
     };
-    const Wrapper: FC = ({ children }) => <HooksProvider hooks={hooks}>{children}</HooksProvider>;
-
-    const t = renderHook(() => proxyHooks.useNumber("answer"), { wrapper: Wrapper });
-    expect(defaultHooks.useNumber).not.toHaveBeenCalled();
-    expect(t.result.error).toEqual(
-      new Error("hook 'useNumber' is not in the shelf or not a function: undefined")
+    const Wrapper: React.FC<React.PropsWithChildren<{}>> = ({ children }) => (
+      <HooksProvider hooks={hooks}>{children}</HooksProvider>
     );
+
+    expect(() => {
+      renderHook(() => proxyHooks.useNumber("answer"), { wrapper: Wrapper });
+    }).toThrow(new Error("hook 'useNumber' is not in the shelf or not a function: undefined"));
+    expect(defaultHooks.useNumber).not.toHaveBeenCalled();
   });
 });
