@@ -5,9 +5,12 @@
 Hookshelf provides React hooks through context.
 
 ``` shell
+# npm
 npm i @susisu/hookshelf
-# or
+# yarn
 yarn add @susisu/hookshelf
+# pnpm
+pnpm add @susisu/hookshelf
 ```
 
 If we think React hooks as "effects", there are only a fixed number of effects types (i.e. build-in hooks), and they are all handled by React.
