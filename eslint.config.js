@@ -7,9 +7,9 @@ import globals from "globals";
 export default config({}, [
   {
     plugins: {
-      "react": reactPlugin,
+      react: reactPlugin,
       "react-hooks": reactHooksPlugin,
-      "vitest": vitestPlugin,
+      vitest: vitestPlugin,
     },
   },
   {

@@ -14,7 +14,7 @@ export type HooksProviderComponent<Hooks extends AbstractHooks> = React.FC<
  * - a set of proxy hooks that will invoke hooks in the shelf when called.
  */
 export function createHookshelf<Hooks extends AbstractHooks>(
-  defaultHooks: Readonly<Hooks>
+  defaultHooks: Readonly<Hooks>,
 ): [HooksProviderComponent<Hooks>, Hooks] {
   const Hookshelf = createContext<Readonly<Hooks>>(defaultHooks);
 
@@ -25,7 +25,7 @@ export function createHookshelf<Hooks extends AbstractHooks>(
         ...parentHooks,
         ...hooks,
       }),
-      [parentHooks, hooks]
+      [parentHooks, hooks],
     );
     return <Hookshelf.Provider value={childHooks}>{children}</Hookshelf.Provider>;
   };
@@ -35,7 +35,7 @@ export function createHookshelf<Hooks extends AbstractHooks>(
     const useX = hooks[key];
     if (typeof useX !== "function") {
       throw new Error(
-        `hook '${String(key)}' is not in the shelf or not a function: ${String(useX)}`
+        `hook '${String(key)}' is not in the shelf or not a function: ${String(useX)}`,
       );
     }
     return useX;
