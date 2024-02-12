@@ -1,6 +1,6 @@
 {
   "name": "@susisu/hookshelf",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Provides React hooks through context",
   "repository": "https://github.com/susisu/hookshelf.git",
   "author": "Susisu <susisu2413@yahoo.co.jp>",

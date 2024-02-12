@@ -17,6 +17,7 @@ If we think React hooks as "effects", there are only a fixed number of effects t
 By providing hooks through context, we can extend the number of effect types to built-in hooks + custom hooks, and they can be handled by a user.
 
 ## Usage
+
 One typical usage is mocking hooks for testing.
 
 Suppose we have a Hook like below:
@@ -131,6 +132,7 @@ test("It returns another data in another state", () => {
 ```
 
 ## Caveats
+
 Use Hookshelf carefully not to break the [Rules of Hooks](https://reactjs.org/docs/hooks-rules.html).
 For example, you should not change hooks after components are rendererd.
 
