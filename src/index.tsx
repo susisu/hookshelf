@@ -50,8 +50,10 @@ export function createHookshelf<Hooks extends AbstractHooks>(
         return useX(...params);
       },
     }[key];
+    // eslint-disable-next-line @susisu/safe-typescript/no-type-assertion
     proxyHooks[key as keyof Hooks] = useXProxy as Hooks[keyof Hooks];
   }
 
+  // eslint-disable-next-line @susisu/safe-typescript/no-type-assertion
   return [HooksProvider, proxyHooks as Hooks];
 }
