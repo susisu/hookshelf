@@ -1,7 +1,7 @@
 import { vi, describe, test, afterEach, expect } from "vitest";
 import React from "react";
 import { renderHook } from "@testing-library/react";
-import type { HooksProviderComponent} from ".";
+import type { HooksProviderComponent } from ".";
 import { createHookshelf } from ".";
 
 describe("createHookshelf", () => {
