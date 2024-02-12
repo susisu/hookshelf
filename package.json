@@ -5,7 +5,21 @@
   "repository": "https://github.com/susisu/hookshelf.git",
   "author": "Susisu <susisu2413@yahoo.co.jp>",
   "license": "MIT",
+  "type": "module",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./lib/index.js",
+        "types": "./lib/index.d.ts"
+      },
+      "require": {
+        "default": "./lib/index.cjs",
+        "types": "./lib/index.d.cts"
+      }
+    }
+  },
   "files": [
     "lib",
     "src",
@@ -22,11 +36,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --coverage",
     "test:dev": "vitest dev --coverage.enabled --coverage.reporter=text",
-    "build": "tsc --build tsconfig.build.json",
-    "clean": "run-s clean:tsc clean:rm",
-    "clean:tsc": "tsc --build tsconfig.build.json --clean",
-    "clean:rm": "rimraf lib",
-    "prepublishOnly": "run-s clean lint typecheck test build"
+    "build": "tsup",
+    "prepublishOnly": "run-s lint typecheck test build"
   },
   "peerDependencies": {
     "react": "^16.14.0 || ^17.0.0 || ^18.0.0"
@@ -37,17 +48,16 @@
     "@types/react": "^18.2.55",
     "@vitest/coverage-v8": "^1.2.2",
     "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-eslint-comments": "^3.2.0",
-    "eslint-plugin-jest": "^27.6.3",
-    "eslint-plugin-jest-formatting": "^3.1.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-vitest": "^0.3.22",
+    "globals": "^14.0.0",
     "jsdom": "^24.0.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.2.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "tsup": "^8.0.2",
     "typescript": "^5.3.3",
     "vitest": "^1.2.2"
   }
