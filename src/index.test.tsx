@@ -1,3 +1,4 @@
+import { vi, describe, test, afterEach, expect } from "vitest";
 import React from "react";
 import { renderHook } from "@testing-library/react";
 import { HooksProviderComponent, createHookshelf } from ".";
@@ -14,15 +15,15 @@ describe("createHookshelf", () => {
     proxyHooks: Hooks;
   } => {
     const defaultHooks: Hooks = {
-      useNumber: jest.fn(() => 0),
-      useString: jest.fn((): string => ""),
+      useNumber: vi.fn(() => 0),
+      useString: vi.fn((): string => ""),
     };
     const [HooksProvider, proxyHooks] = createHookshelf(defaultHooks);
     return { defaultHooks, HooksProvider, proxyHooks };
   };
 
   // suppress error messages
-  const consoleError = jest.spyOn(console, "error").mockImplementation();
+  const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 
   afterEach(() => {
     consoleError.mockReset();
@@ -44,7 +45,7 @@ describe("createHookshelf", () => {
     const { defaultHooks, HooksProvider, proxyHooks } = createFixture();
 
     const hooks: Partial<Hooks> = {
-      useNumber: jest.fn(() => 42),
+      useNumber: vi.fn(() => 42),
     };
     const Wrapper: React.FC<React.PropsWithChildren<{}>> = ({ children }) => (
       <HooksProvider hooks={hooks}>{children}</HooksProvider>
@@ -64,10 +65,10 @@ describe("createHookshelf", () => {
     const { defaultHooks, HooksProvider, proxyHooks } = createFixture();
 
     const hooks1: Partial<Hooks> = {
-      useNumber: jest.fn(() => 42),
+      useNumber: vi.fn(() => 42),
     };
     const hooks2: Partial<Hooks> = {
-      useString: jest.fn(() => "Alice"),
+      useString: vi.fn(() => "Alice"),
     };
     const Wrapper: React.FC<React.PropsWithChildren<{}>> = ({ children }) => (
       <HooksProvider hooks={hooks1}>
